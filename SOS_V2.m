@@ -30,19 +30,19 @@ sit1 = imread('Snoopsit1.jpg');
 % disp("DONE"); Make MatLab display DONE in Command Window after code
 % reaches here
 % 
-% BWstool1 = roipoly(stool1);
+BWstool1 = roipoly(stool1);
 % BWstool2 = roipoly(stool2);
 % BWstool3    = roipoly(stool3);
 % 
-% grayStool1 = 255*uint8(BWstool1);
+grayStool1 = 255*uint8(BWstool1);
 % grayStool2 = 255*uint8(BWstool2);
 % grayStool3 = 255*uint8(BWstool3);
 % 
-% RGBStool1 = cat(3, grayStool1, grayStool1, grayStool1); 
+RGBStool1 = cat(3, grayStool1, grayStool1, grayStool1); 
 % RGBStool2 = cat(3, grayStool2, grayStool2, grayStool2);
 % RGBStool3 = cat(3, grayStool3, grayStool3, grayStool3);
 % 
-% Substool1 = imsubtract(RGBStool1, sit1);
+Substool1 = imsubtract(RGBStool1, sit1);
 % Substool1_2 = imsubtract(RGBStool2, sit1); 
 % Substool1_3 = imsubtract(RGBStool3, sit1);
 % 
@@ -54,7 +54,7 @@ sit1 = imread('Snoopsit1.jpg');
 % Substool3_2 = imsubtract(RGBStool2, sit3);
 % Substool3_3 = imsubtract(RGBStool3, sit3);
 % 
-% figure(1); imshow(Substool1);
+figure(1); imshow(Substool1);
 % figure(4); imshow(RGBStool1);
 % figure(5); imshow(sit1);
 % figure(2); imshow(BWcr);
@@ -71,56 +71,57 @@ sit1 = imread('Snoopsit1.jpg');
 % figure(32); imshow(Substool3_2);
 % figure(33); imshow(Substool3_3);
 
+%% Start New Stuff
 %Resize the Image
 
-sstool1=imresize(sstool1,[256 256]);
-
-% Display the Image
-
-imshow(sstool1);
-
-% Get Inputs from Mouse,Select 4 Seed Points in Image
-
-[Col Row]=ginput(4);
-
-c =Col;
-r =Row;
-
-% Select polygonal region of interest
-BinaryMask = roipoly(sstool1,c,r);
-figure, imshow(BinaryMask);title('Selected Region of Interest');
-
-%Create Buffer for ROI
-ROI=zeros(256,256);
-
-%Create Buffer for NONROI
-NONROI=zeros(256,256);
-for i=1:256
-
-for j=1:256
-
-if BinaryMask(i,j)==1
-ROI(i,j)=sstool1(i,j);
-
-else
-NONROI(i,j)=sstool1(i,j);
-end
-
-end
-
-end
-
-%Display ROI and Non ROI
-figure;
-subplot(1,2,1);imshow(ROI,[]);title('ROI');
-subplot(1,2,2);imshow(NONROI,[]);title('NON ROI');
+%sstool1 = imresize(sstool1,[256 256]);
+% 
+% % Display the Image
+% 
+% imshow(sstool1);
+% 
+% % Get Inputs from Mouse,Select 4 Seed Points in Image
+% 
+% [Col Row]=ginput(4);
+% 
+% c =Col;
+% r =Row;
+% 
+% % Select polygonal region of interest
+% BinaryMask = roipoly(sstool1,c,r);
+% figure, imshow(BinaryMask);title('Selected Region of Interest');
+% 
+% %Create Buffer for ROI
+% ROI=zeros(256,256);
+% 
+% %Create Buffer for NONROI
+% NONROI=zeros(256,256);
+% for i=1:256
+% 
+% for j=1:256
+% 
+% if BinaryMask(i,j)==1
+% ROI(i,j)=sstool1(i,j);
+% 
+% else
+% NONROI(i,j)=sstool1(i,j);
+% end
+% 
+% end
+% 
+% end
+% 
+% %Display ROI and Non ROI
+% figure;
+% subplot(1,2,1);imshow(ROI,[]);title('ROI');
+% subplot(1,2,2);imshow(NONROI,[]);title('NON ROI');
 
 %% Edge Detection
-% BW1 = edge(stool1,'sobel');
-% BW2 = edge(stool2,'canny');
-% figure;
-% imshowpair(BW1,BW2,'montage')
-% title('Sobel Filter                                   Canny Filter');
+BW1 = edge(stool1,'sobel');
+BW2 = edge(stool2,'canny');
+figure;
+imshowpair(BW1,BW2,'montage')
+title('Sobel Filter                                   Canny Filter');
 
 %% Background Subtraction
 
@@ -209,3 +210,19 @@ subplot(1,2,2);imshow(NONROI,[]);title('NON ROI');
 % end
 % 
 % end
+
+%% Another Working Card Dectection 
+
+
+
+%For TEST IMAGE
+
+imshow(J)
+    [B,L] = bwboundaries(J, 'noholes');
+
+    figure; imshow(J); hold on;
+
+    for k = 1;length(B),
+        boundary = B{k};
+        plot(boundary(:,2),boundary(:,1),'g','LineWidth',2);
+end
