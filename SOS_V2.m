@@ -31,45 +31,16 @@ sit1 = imread('Snoopsit1.jpg');
 % reaches here
 % 
 BWstool1 = roipoly(stool1);
-% BWstool2 = roipoly(stool2);
-% BWstool3    = roipoly(stool3);
-% 
+
 grayStool1 = 255*uint8(BWstool1);
-% grayStool2 = 255*uint8(BWstool2);
-% grayStool3 = 255*uint8(BWstool3);
-% 
+
 RGBStool1 = cat(3, grayStool1, grayStool1, grayStool1); 
-% RGBStool2 = cat(3, grayStool2, grayStool2, grayStool2);
-% RGBStool3 = cat(3, grayStool3, grayStool3, grayStool3);
-% 
+
 Substool1 = imsubtract(RGBStool1, sit1);
-% Substool1_2 = imsubtract(RGBStool2, sit1); 
-% Substool1_3 = imsubtract(RGBStool3, sit1);
-% 
-% Substool2 = imsubtract(RGBStool1, sit2);
-% Substool2_2 = imsubtract(RGBStool2, sit2);
-% Substool2_3 = imsubtract(RGBStool3, sit2);
-% 
-% Substool3 = imsubtract(RGBStool1, sit3);
-% Substool3_2 = imsubtract(RGBStool2, sit3);
-% Substool3_3 = imsubtract(RGBStool3, sit3);
-% 
+
+
 figure(1); imshow(Substool1);
-% figure(4); imshow(RGBStool1);
-% figure(5); imshow(sit1);
-% figure(2); imshow(BWcr);
-% figure(7); imshow(stool1);
-% 
-% figure(12); imshow(Substool1_2);
-% figure(13); imshow(Substool1_3);
-% 
-% figure(2); imshow(Substool2);
-% figure(22); imshow(Substool2_2);
-% figure(23); imshow(Substool2_3);
-% 
-% figure(3); imshow(Substool3);
-% figure(32); imshow(Substool3_2);
-% figure(33); imshow(Substool3_3);
+
 
 %% Start New Stuff
 %Resize the Image
