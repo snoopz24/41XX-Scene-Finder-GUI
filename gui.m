@@ -80,79 +80,144 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-b = imread('tablealt.jpg');
+b = imread('tablealt2.jpg');
 axes(handles.axes1);
 imshow(b);
 
-I0 = imread('Snoopsit1.jpg');  % Load picture from camera using snapshot feature
-J0 = imread('stool1.jpg');
-J01 = imread('stool3.jpg');
-Jr = imrotate(J0, 270);
-Ir = imrotate(I0, 270);       %Rotate 
-J1r = imrotate(J01, 270);
-tol = 7000;
+SL = imread('snoopsitLeft.jpg');
+SM = imread('snoopsitMid.jpg');
+SR = imread('snoopsitRight.jpg');
+
+SLR = imrotate(SL, 270);
+SMR = imrotate(SM, 270);
+SRR = imrotate(SR, 270);
+
 %% Convert RGB to Gray Image
-I = rgb2gray(Ir);            %Convert 3-plane RGB image into grayscale intensity image (Which is apparently Logical *BW*)
-J = rgb2gray(Jr);
-J1 = rgb2gray(J1r);
+SLG = rgb2gray(SLR);            %Convert 3-plane RGB image into grayscale intensity image (Which is apparently Logical *BW*)
+SMG = rgb2gray(SMR);
+SRG = rgb2gray(SRR);
 
-%% Define Intensity of gray image conversion
-I = I > 75;     %Set intensity of gray scale (255 representing black and 0 as white)
-J = J > 75;     %75 is a good number that fully detects the stool and snoops
-J1 = J1 > 75;
-%% ROI STUFF
-%% [1084.5 396.5;1100.5 3108.5;1860.5 3092.5;1772.5 388.5] %'Stool1' Stool Position NX2 CONTAINING X & Y COORDINATES
-%% [60.5 1324.5;36.5 1932.5;396.5 2108.5;292.5 1588.5] %'Snoopssit1' Snoops hand position NX2 CONTAINING X & Y COORDINATES
 
-Jc = [1084.5 1100.5 1860.5 1772.5]; %column vector for stool ROI
-Jr = [396.5 3108.5 3092.5 388.5];   % Row vector for stool ROI
+SLG = SLG > 55;     %Set intensity of gray scale (255 representing black and 0 as white)
+SMG = SMG > 55;     %75 is a good number that fully detects the stool and snoops
+SRG = SRG > 55;
 
-Hc = [60.5 36.5 396.5 292.5];        % Diddo for hand
-Hr = [1324.5 1932.5 2108.5 1588.5];  
 
-stoolROI = roipoly(J, Jc, Jr);%Black and white ROI of stool. stool = white = 255   
-snoopROI = stoolROI;
-handROI = roipoly(J, Hc, Hr);%Black and white ROI of Hand. hand = white = 255
-nohandROI = handROI;
+%% Empty masks
 
-S_mask = imsubtract(stoolROI, J); %Mask of stool. STOOL IS WHITE IN ROI
-H_mask = imsubtract(handROI, J);  % Mask of Hand. HAND IS WHITE, REST OF IMAGE IS BLACK. 
+SLC = [1112 545 500 1073];
+SLR = [3014 3038 2000 1988];
 
-S1_mask = imsubtract(stoolROI, J1);
+SLCempty = [1112 545 500 1073];
+SLRempty = [3014 3038 2000 1988];
 
-Sn_mask = imsubtract(snoopROI, I); %Shows snoops on the stool
-Nh_mask = imsubtract(nohandROI, I); %No hand in second ROI
+SMC = [1127 1133 1604 1598];
+SMR = [1916 3062 3065 1916];
 
-%% Next need to determine sum of pixels in each image.
+SRC = [1602.5 2122.5 2146.5 2994.5];
+SRR = [1926.5 1926.5 2990.5 2994.5];
 
-sum(S_mask(:) == 75);
-sum(H_mask(:) == 75);
-sum(Sn_mask(:) == 75);
-sum(Nh_mask(:) == 75);
-sum(S1_mask(:) == 75);
+SLGemptypoly = roipoly(SMG, SLCempty, SLRempty);
+SLemptymask = imsubtract(SLGemptypoly, SMG);
 
-p_snoop = histc(Sn_mask(:), 0:1 );
-p_stool = histc(S_mask(:), 0:1 ); 
-p1_stool = histc(S1_mask(:), 0:1 );
-p_hand = histc(H_mask(:), 0:1 );
-p_nohand = histc(Nh_mask(:), 0:1 );
+SMGemptypoly = roipoly(SLG,SMC,SMR);
+SMemptymask = imsubtract(SMGemptypoly, SLG);
 
-index3 = abs(p_stool -p_stool) <tol
-index2 = abs(p_snoop - p_stool) <tol
+SRGemptypoly = roipoly(SLG,SRC,SRR);
+SRemptymask = imsubtract(SRGemptypoly, SLG);
 
-if index2 == [1 1]
+%% Empty Sums and histc
+
+sum(SLemptymask(:) == 55);
+sum(SMemptymask(:) == 55);
+sum(SRemptymask(:) == 55);
+
+p_emptyR = histc(SRemptymask(:), 0:1);
+p_emptyM = histc(SMemptymask(:), 0:1);
+p_emptyL = histc(SLemptymask(:), 0:1);
+
+
+%% Looped captured images
+% inside the loop::
+% get the picture
+% convert to grey
+% roipoly the image
+% mask the image
+% sum the image
+% mask the image
+% then subtract from p taken
+% index
+
+%code for getting pic from camera and rotating it so its usable
+%code for converting the image to grey scale
+
+
+for v = 1.0:-0.2:0
+    
+    %code for getting pic from camera and rotating it so its usable
+    %code for converting the image to grey scale
+    %% Roipoly and Mask
+    SLGpoly = roipoly(SLG, SLC, SLR);
+    SLmask = imsubtract(SLGpoly, SLG);
+    
+    SMGpoly = roipoly(SLG, SMC, SMR);  %changed to look at snoopsitleft pic mid seat
+    SMmask = imsubtract(SMGpoly, SLG);
+
+    SRGpoly = roipoly(SLG, SRC, SRR); %changed to look at snoopsitleft pic right seat
+    SRmask = imsubtract(SRGpoly, SLG);
+    %% Sum and Histc
+    
+    sum(SLmask(:) == 55);
+    sum(SMmask(:) == 55);
+    sum(SRmask(:) == 55);
+    
+    p_takenL = histc(SLmask(:), 0:1 );
+    p_takenM = histc(SMmask(:), 0:1);
+    p_takenR = histc(SRmask(:), 0:1);
+
+    %% Index Comparison
+    tol = 15000;
+    
+    indexL = abs(p_takenL - p_emptyL) <tol;
+    indexM = abs(p_takenM - p_emptyM) <tol;
+    indexR = abs(p_takenR - p_emptyR) <tol;
+    
+        if indexL == [1 1]
      d = 'theres no one here';
-     d
-     set(handles.panel1,'Backgroundcolor','r');
-elseif index2 == [0 0]
-    d = 'there is someone here';
-    d
     set(handles.panel1,'Backgroundcolor','g');
-else
+    elseif indexL == [0 0]
+    d = 'there is someone here';
+    set(handles.panel1,'Backgroundcolor','r');
+    else
      d = 'theres no one here';
-     d
+     
+    end
+    
+     %% Output Middle Seat
+    if indexM == [1 1]
+     d = 'theres no one here';
+     set(handles.panel2,'Backgroundcolor','g');
+    elseif indexM == [0 0]
+    d = 'there is someone here';
+    set(handles.panel2,'Backgroundcolor','r');
+    else
+     d = 'theres no one here';
+     
+    end
+     %% Output Right Seat
+        if indexR == [1 1]
+     d = 'theres no one here';
+     set(handles.panel3,'Backgroundcolor','g');
+    elseif indexR == [0 0]
+    d = 'there is someone here';
+    set(handles.panel3,'Backgroundcolor','r');
+    else
+     d = 'theres no one here';
+          
+     end
+    
+    pause(2)
 end
-
 
 % --- Executes on button press in redbutton.
 function redbutton_Callback(hObject, eventdata, handles)
@@ -165,6 +230,7 @@ function redbutton_Callback(hObject, eventdata, handles)
 
 set(handles.panel1,'Backgroundcolor','r');
 set(handles.panel2,'Backgroundcolor','r');
+set(handles.panel3,'Backgroundcolor','r');
 
 % --- Executes on button press in greenbutton.
 function greenbutton_Callback(hObject, eventdata, handles)
@@ -173,3 +239,4 @@ function greenbutton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 set(handles.panel1,'Backgroundcolor','g');
 set(handles.panel2,'Backgroundcolor','g');
+set(handles.panel3,'Backgroundcolor','g');
